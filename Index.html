@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Time Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('images/background.jpg'); /* Gantilah dengan link gambar background Anda */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Warna putih transparan */
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .calendar div {
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .calendar .day-name {
+            background-color: #333;
+            color: white;
+        }
+        .calendar .today {
+            background-color: red;
+            color: white;
+        }
+        .month-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .month-control button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+            .calendar div {
+                padding: 7px;
+            }
+            iframe {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="month-year">Kalender</h1>
+        <div class="month-control">
+            <button id="prev-month">Sebelumnya</button>
+            <button id="next-month">Selanjutnya</button>
+        </div>
+        <div class="calendar" id="calendar">
+            <!-- Kalender akan diisi oleh JavaScript -->
+        </div>
+    </div>
+
+    <!-- Iframe untuk menampilkan web yang diminta -->
+    <iframe src="https://smkn2-mdo-xi-tjkt-ii.netlify.app"></iframe>
+
+    <script>
+        const monthNames = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+
+        const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            const month = currentDate.getMonth();
+            const year = currentDate.getFullYear();
+            const today = new Date();
+
+            document.getElementById('month-year').textContent = `${monthNames[month]} ${year}`;
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+
+            // Tambahkan nama hari
+            dayNames.forEach(day => {
+                const dayName = document.createElement('div');
+                dayName.textContent = day;
+                dayName.classList.add('day-name');
+                calendar.appendChild(dayName);
+            });
+
+            // Tentukan tanggal pertama dan jumlah hari dalam bulan
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Isi kalender dengan hari kosong sebelum tanggal pertama
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                calendar.appendChild(emptyCell);
+            }
+
+            // Isi kalender dengan tanggal
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.textContent = day;
+
+                // Tandai hari ini dengan warna merah
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayCell.classList.add('today');
+                }
+
+                calendar.appendChild(dayCell);
+            }
+        }
+
+        document.getElementById('prev-month').addEventListener('click', function() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('next-month').addEventListener('click', function() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Render kalender saat halaman pertama kali dimuat
+        renderCalendar();
+
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification() {
+            if (Notification.permission === 'granted') {
+                const notification = new Notification('Selamat Pagi', {
+                    body: 'Semoga harimu cerah',
+                });
+            }
+        }
+
+        // Meminta izin notifikasi jika belum diberikan
+        if (Notification.permission !== 'denied' && Notification.permission !== 'granted') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    checkTimeForNotification();
+                }
+            });
+        } else if (Notification.permission === 'granted') {
+            checkTimeForNotification();
+        }
+
+        // Mengecek waktu saat ini setiap menit
+        function checkTimeForNotification() {
+            const now = new Date();
+            if (now.getHours() === 6 && now.getMinutes() === 0) {
+                showNotification();
+            }
+            setTimeout(checkTimeForNotification, 60000); // Cek setiap 1 menit
+        }
+    </script>
+
+</body>
+</html>
