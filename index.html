@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real Time Calendar</title>
@@ -13,7 +15,7 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            background-image: url('images/background.jpg'); /* Gantilah dengan link gambar background Anda */
+            background-image: url('images/background.jpg'); /* Pastikan gambar latar sudah benar */
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -69,7 +71,7 @@
         }
         iframe {
             width: 100%;
-            height: 500px;
+            height: 700px;
             margin-top: 10px;
             border: none;
             border-radius: 15px;
@@ -80,14 +82,52 @@
                 padding: 7px;
             }
             iframe {
-                height: 300px;
+                height: 400px;
             }
         }
+        /* Gaya untuk Tombol Google */
+        .google-btn {
+            display: inline-block;
+            background-color: #4285F4;
+            color: white;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .google-btn:hover {
+            background-color: #357ae8;
+        }
+
+        .google-btn img {
+            vertical-align: middle;
+            margin-right: 8px;
+            height: 20px;
+        }
+        .g-signin2{
+          
+  position: sticky;
+  top: 0;
+  
+  padding: 10px;
+
+        }
+        
     </style>
 </head>
 <body>
-
+  
+        <!-- Tombol Google Sign-In -->
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
     <div class="container">
+
         <h1 id="month-year">Kalender</h1>
         <div class="month-control">
             <button id="prev-month">Sebelumnya</button>
@@ -96,6 +136,12 @@
         <div class="calendar" id="calendar">
             <!-- Kalender akan diisi oleh JavaScript -->
         </div>
+
+        <!-- Tombol Google dengan gaya yang telah ditentukan -->
+        <button class="google-btn" onclick="window.location.href='https://www.google.com'">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-_vHSdgCV_IU2nDa6ccOVK8b6yvlaDUgqAkrodPBn3dgZlAVf4UYLySxn&s=10" alt="Google Logo">
+            Search with Google
+        </button>
     </div>
 
     <!-- Iframe untuk menampilkan web yang diminta -->
@@ -192,6 +238,13 @@
                 showNotification();
             }
             setTimeout(checkTimeForNotification, 60000); // Cek setiap 1 menit
+        }
+
+        // Fungsi Google Sign-In
+        function onSignIn(googleUser) {
+            const profile = googleUser.getBasicProfile();
+            console.log('Name: ' + profile.getName());
+            console.log('Email: ' + profile.getEmail());
         }
     </script>
 
